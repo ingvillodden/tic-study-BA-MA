@@ -24,6 +24,6 @@ dat <- bind_rows(file.list)
 
 
 ## Save imported data 
-saveRDS(dat, "data/derivedData/session-data.RDS") %>% view()
+saveRDS(dat, "data/derivedData/session-data.RDS")
 
 
