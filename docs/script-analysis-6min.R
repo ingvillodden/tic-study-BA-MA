@@ -35,7 +35,6 @@ session_id <- session_id %>%
   summarise(period = mean(period))
 
 
-
 ## we need to make a function that normalizes performance index ##
 normalization <- function(x) {
   x / max(x)
@@ -79,7 +78,6 @@ full_data <- session_data %>%
   filter(id != 30) 
 
 
-
 # making a simple scatterplot 
 full_data %>% 
   ggplot(aes(x = rel.vo2, y = change_per.index)) +
@@ -89,7 +87,6 @@ full_data %>%
 
 # load required packages
 library(modelr)
-
 
 # making model datasett and using log2
 model_data <- full_data %>% 
@@ -107,7 +104,7 @@ ggplot(model_data, aes(x = l.rel.vo2, y = l.change_per.index)) +
 model <- lm(l.change_per.index ~ l.rel.vo2, data = model_data)
 
 
-# 
+# Visualize the predicted values with an evenly spaced grid
 grid <- model_data %>% 
   data_grid(rel.vo2 = seq_range(rel.vo2, 100)) %>% 
   mutate(l.rel.vo2 = log2(rel.vo2)) %>% 
@@ -115,43 +112,57 @@ grid <- model_data %>%
   mutate(change_per.index = 2 ^ l.change_per.index)
 
 
+# Visualizing the model by plotting the line for the predictions
 ggplot(model_data, aes(rel.vo2, change_per.index)) + 
   geom_point() + 
   geom_line(data = grid, colour = "red", size = 1) +
   theme_bw()
 
 
+# adding the residuals for the model
 model_data <- model_data %>% 
   add_residuals(model, "lresid")
 
+
+# plotting the residuals
 ggplot(model_data, aes(l.rel.vo2, lresid)) + 
   geom_point() +
   geom_ref_line(h = 0, colour = "grey30") +
   theme_bw()
 
 
+# summarise the model
 summary(model)
 
 
+# making a second model that takes the individual effect of relative VO2max at T1
 model2 <- lm(l.change_per.index ~ l.rel.vo2 + vo2.rel.max_T1, data = model_data)
 
+
+# Visualize the predicted values for model2 with an evenly spaced grid
 grid2 <- model_data %>% 
   data_grid(vo2.rel.max_T1, .model = model2) %>% 
   add_predictions(model2)
 grid2
 
 
+# plotting the predicted values for relative VO2max
 ggplot(grid2, aes(vo2.rel.max_T1, pred)) + 
   geom_point() +
   theme_bw()
 
 
+# adding residuals
 model_data <- model_data %>% 
   add_residuals(model2, "lresid2")
 
+
+# plotting the residuals
 ggplot(model_data, aes(l.rel.vo2, lresid2)) + 
   geom_point() +
   geom_ref_line(h = 0, colour = "grey30") +
   theme_bw()
 
+
+# summarise model2
 summary(model2)
