@@ -1,4 +1,4 @@
-## analysis of 6min data
+## analysis of min data
 
 
 # loading basic packages 
@@ -7,7 +7,7 @@ library(readxl)
 
 
 # Importing the different datasets needed for the analysis
-session_data <- readRDS("data/derivedData/session-data-6min.RDS")
+session_data <- readRDS("data/derivedData/session-data-4min.RDS")
 test_data  <- read_excel("data/testday1.xlsx", na = "na") 
 session_id <- read_excel("data/sessions-data.xlsx", na = "na")
 trimp_data <- read_excel("data/trimp-data.xlsx", na = "na")
@@ -52,7 +52,7 @@ per_index <- test_data %>%
   mutate(change_per_index = T4 - T1,
          change_per_index_percent = (T4 - T1) / T1 * 100) %>% 
   dplyr::select(id, change_per_index, change_per_index_percent)
-  
+
 
 # making a dataset containing percent change for w.4mmol, vo2.max, w.max and w.15tt
 change_data <- test_data %>% 
@@ -99,7 +99,7 @@ full_data <- session_data %>%
   filter(id != 30) %>% 
   filter(vo2.rel.max_T1 >= 60) %>% 
   filter(id != 36)
- 
+  
 
 
 # making a simple scatterplot 
@@ -119,13 +119,6 @@ full_data %>%
 # making a simple scatterplot for percent change for VO2max
 full_data %>% 
   ggplot(aes(x = rel.vo2, y = change_vo2)) +
-  geom_point() +
-  theme_bw()
-
-
-# making a scatterplot comparing rel.vo2 and trimp
-full_data %>% 
-  ggplot(aes(rel.vo2, trimp)) +
   geom_point() +
   theme_bw()
 
@@ -230,7 +223,7 @@ summary(model2)
 
 ################################################################################
 
-  
+
 # making a smooth model with the loess() function
 model_smooth <- loess(change_per_index ~ rel.vo2, data = model_data)
 
@@ -263,4 +256,5 @@ ggplot(model_data, aes(rel.vo2, resid_smooth)) +
 
 # summarise the smooth model
 summary(model_smooth)
+
 
